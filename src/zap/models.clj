@@ -38,7 +38,7 @@
 
 (defn- issue-query []
   (-> (select* issue)
-      (fields [:issue.id :id]
+      (fields :issue.id ;[:issue.id :id]
                   :project_id
                   :title
                   :description
@@ -48,7 +48,7 @@
 
 (defn issues-by-project [id]
   (->  (issue-query)
-         (where {:issue.id id})
+         (where {:issue.project_id id})
          exec))
 
 (defn issue-by-id [id]
@@ -74,7 +74,7 @@
           (where {:id id})))
 
 (defn create-issue [params]
-  (insert issue (values (select-keys params [:project_id :description :status]))))
+  (insert issue (values (select-keys params [:project_id :title :description :status]))))
 
 (defn create-comment [params]
   (insert comment (values (select-keys params [:issue_id :content]))))

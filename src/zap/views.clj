@@ -1,26 +1,28 @@
 (ns zap.views
-  (:require [hiccup.page :refer [html5 include-js include-css]]
-                 [hiccup.form :refer [form-to text-field submit-button text-area]]
-                 [ring.util.response :as response]
-                 [zap.models :as models]))
+  (:require [clojure.data.json :as json]
+            [hiccup.page :refer [html5 include-js include-css]]
+            [hiccup.form :refer [form-to text-field submit-button text-area]]
+            [ring.util.response :as response]
+            [zap.models :as models]))
+            ;[zap.validations :as valid]))
 
 (defn index []
   (response/redirect "/projects"))
 
-  (defn base-page [title & body]
-  (html5
-   [:head
-    (include-css "/css/bootstrap.min.css")
-    (include-css "/css/zap.css")
-    [:title title]]
-   [:body
-    [:div {:class "navbar navbar-inverse"}
-     [:div {:class :navbar-inner}
-      [:a {:class :brand :href "/"} "Zap!"]
-      [:form {:class "navbar-form pull-right"}
-       [:input {:type :text :class :search-query :placeholder :Search}]]]]
+(defn base-page [title & body]
+(html5
+ [:head
+  (include-css "/css/bootstrap.min.css")
+  (include-css "/css/zap.css")
+  [:title title]]
+ [:body
+  [:div {:class "navbar navbar-inverse"}
+   [:div {:class :navbar-inner}
+    [:a {:class :brand :href "/"} "Zap!"]
+    [:form {:class "navbar-form pull-right"}
+     [:input {:type :text :class :search-query :placeholder :Search}]]]]
 
-    [:div.container (seq body)]]))
+  [:div.container (seq body)]]))
 
 (defn projects []
   (base-page
@@ -45,12 +47,13 @@
 (defn make-project [params]
   (models/create-project params)
   (response/redirect-after-post "/projects"))
+  
+(defn issues [] "")
 
 (defn issues-by-project [id]
   (let [proj (models/project-by-id id)]
     (base-page
      (str (:name proj) " - Zap")
-
      [:div.row.admin-bar
       [:a {:href (str "/project/" (:id proj) "/issue/new")}
        "New Issue"]]
@@ -73,7 +76,6 @@
             (row (:id iss))
             (row (:title iss))
             (row (:status_name iss))]))]])))
-
 ;
 
 (defn new-issue [id]
@@ -169,7 +171,37 @@
     (response/redirect-after-post (str "/issue/" id))))
 
 (defn close-issue [id params]
-  (when-let [status (models/status-by-name (:close params))]
-    (models/close-issue id (:id status)))
+  (when-let [status (models/status-by-name {:close params})] ;(:close params)
+    (models/close-issue id {:id status})) ;(:id status)
   (response/redirect-after-post (str "/issue/" id)))
 
+  ;
+(defn create-project [params]
+  ;(let [errors (valids/valid-project? params)]
+  (let [errors false]
+    (if errors
+      {:status 400
+       :body (json/write-str {:errors errors})}
+      (do
+        (models/create-project params)
+        {:status 200 :body ""}))))
+;
+
+(defn delete-project [id]
+  (models/delete-project id)
+  {:status 200
+   :body ""})
+
+;
+(defn edit-project [id params]
+  ;(let [errors (valids/valid-project? params)]
+  (let [errors false]
+    (if errors
+      {:status 400
+       :body (json/write-str {:errors errors})}
+      (if-let [proj (models/project-by-id id)]
+        (do
+          (models/update-project id params)
+          {:status 200 :body ""})
+        {:status 404 :body ""}))))
+;
