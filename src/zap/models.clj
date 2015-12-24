@@ -1,7 +1,8 @@
 (ns zap.models
-  (:refer-clojure :exclude [comment])
-  (:use korma.db korma.core)
-  (:require [clojure.string :as string]))
+  (:refer-clojure :exclude [comment update])
+  (:require [korma.core :refer :all]
+            [korma.db :refer :all]
+            [clojure.string :as string]))
 
 (defdb zap
   (sqlite3 {:db "zap.db"}))
@@ -15,8 +16,9 @@
     (has-many comment))
 
 (defentity status
-  (entity-fields :id name))
+  (entity-fields :id :name))
 
+  ; future database field
 (defentity tag
   (entity-fields :id :issue_id :tag))
 
@@ -63,10 +65,10 @@
           (order :id)))
 
 (defn status-by-name [s]
-  (first (select status (where {:name s}))))
-
+  (first(select status (where {:name s}))))
+  
 (defn delete-project [id]
-  (delete project (where {:id id})))
+  (delete project (where (:id id))))
 
 (defn update-project [id params]
   (update project
@@ -92,5 +94,3 @@
         (where (or (like (sqlfn lower :issue.title) q)
                           (like (sqlfn lower :issue.description) q)))
         exec)))
-
-

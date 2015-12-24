@@ -171,8 +171,8 @@
     (response/redirect-after-post (str "/issue/" id))))
 
 (defn close-issue [id params]
-  (when-let [status (models/status-by-name {:close params})] ;(:close params)
-    (models/close-issue id {:id status})) ;(:id status)
+  (when-let [status (models/status-by-name (:close params))]
+  (models/close-issue id (:id status)))
   (response/redirect-after-post (str "/issue/" id)))
 
   ;
