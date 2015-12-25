@@ -63,9 +63,10 @@
      [:table.table
       [:thead
        [:tr
-        [:th.span1 {:scope :col} "#"]
-        [:th.span10 {:scope :col} "Title"]
-        [:th.span1 {:scope :col} "Status"]]]
+        [:th.span1 {:scope :col} "Ticket"]    ; span1
+        [:th.span10 {:scope :col} "Title"]    ; span10
+        [:th.span8 {:scope :col} "Username"]
+        [:th.span1 {:scope :col} "Status"]]]  ; span1
       [:tbody
        (for [iss (models/issues-by-project (:id proj))]
          (let [row (fn [& content]
@@ -75,6 +76,7 @@
            [:tr
             (row (:id iss))
             (row (:title iss))
+            (row (:user iss))
             (row (:status_name iss))]))]])))
 ;
 
@@ -89,6 +91,10 @@
       (text-field {:class "span8"
                          :type :text
                          :placeholder "Title"} :title)
+      [:br]
+      (text-field {:class "span8"
+                         :type :text
+                         :placeholder "Username"} :user)
       [:br]
       (text-area {:class "span8"
                         :placeholder "Description"

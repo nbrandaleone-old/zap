@@ -10,7 +10,14 @@ CREATE TABLE issue (
   project_id INTEGER REFERENCES project(id) NOT NULL,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
+  user TEXT NOT NULL,
   status INTEGER REFERENCES status(id) NOT NULL
+);
+
+CREATE TABLE user (
+  id INTEGER PRIMARY KEY,
+  issue_id INTEGER REFERENCES issue(id) NOT NULL,
+  name TEXT NOT NULL
 );
 
 CREATE TABLE status (

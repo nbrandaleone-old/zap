@@ -12,7 +12,7 @@
 
 (declare comment)
 (defentity issue
-    (entity-fields :id :project_id :title :description :status)
+    (entity-fields :id :project_id :title :description :user :status)
     (has-many comment))
 
 (defentity status
@@ -44,6 +44,7 @@
                   :project_id
                   :title
                   :description
+                  :user
                   [:status.id :status_id]
                   [:status.name :status_name])
       (join status (= :issue.status :status.id))))
@@ -76,7 +77,7 @@
           (where {:id id})))
 
 (defn create-issue [params]
-  (insert issue (values (select-keys params [:project_id :title :description :status]))))
+  (insert issue (values (select-keys params [:project_id :title :user :description :status]))))
 
 (defn create-comment [params]
   (insert comment (values (select-keys params [:issue_id :content]))))
