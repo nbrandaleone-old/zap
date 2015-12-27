@@ -7,7 +7,9 @@
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [clojure.data.json :as json]
             [zap.views :as views]
-            [zap.models :as models]))
+            [zap.models :as models]
+	    [ring.adapter.jetty :as jetty])
+  (:gen-class))
 
 (defroutes api-routes
   (GET "/projects" []
@@ -66,3 +68,7 @@
       (wrap-resource "public")
       wrap-keyword-params
       wrap-params))
+
+(defn -main [& args]
+  (jetty/run-jetty app {:port 8080}))
+
